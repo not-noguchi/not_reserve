@@ -28,3 +28,15 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'prefix' => '{apiAdmi
     // 予約キャンセル(カレンダー用)
     Route::post('calendar/cancel_reserve', 'CalendarController@cancelRserve')->name('calendar_cancel_reserve');
 });
+
+
+// API ユーザー
+Route::pattern('apiUser', 'user');
+Route::group(['namespace' => 'App\Http\Controllers\User', 'prefix' => '{apiUser}', 'middleware' => ['auth:api']], function() {
+    // カレンダー情報取得
+    Route::post('calendar/fetch', 'CalendarController@fetch')->name('user_calendar_fetch');
+    // 予約登録(カレンダー用)
+    Route::post('calendar/add_reserve', 'CalendarController@addRserve')->name('user_calendar_add_reserve');
+    // 予約キャンセル(カレンダー用)
+    Route::post('calendar/cancel_reserve', 'CalendarController@cancelRserve')->name('user_calendar_cancel_reserve');
+});

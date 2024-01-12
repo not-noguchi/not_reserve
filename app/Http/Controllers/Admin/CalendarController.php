@@ -35,52 +35,20 @@ class CalendarController extends Controller
      */
     public function fetch(Request $request): JsonResponse
     {
-        Log::debug("debug ログ!");
-        Log::debug(print_r($request->all(), true));
         // バリデーション
         $request->validate([
             'start_date' => 'required|integer',
             'end_date' => 'required|integer'
         ]);
-        Log::debug(print_r($request->all(), true));
         // カレンダー表示期間取得
         $startDate = date('Y-m-d', $request->input('start_date') / 1000);
         $endDate = date('Y-m-d', $request->input('end_date') / 1000);
-        Log::debug($startDate);
-        Log::debug($endDate);
         $resultInfo = ['code'=>200, 'message'=>''];
-
-        // $product = $this->service->fetchProduct($request->product_id);
-        // if (!$product) {
-        //     return response()->json(null, 404);
-        // }
-
-        // $municipalityInfo = [];
-        // if ($product['municipality_id']) {
-        //     $municipalityInfo = $this->service->fetchMunicipalityInfo($product['municipality_id']);
-        // }
-        // if (!$municipalityInfo) {
-        //     return response()->json(null, 404);
-        // }
 
         $reserve = $this->service->fetchReserve($startDate, $endDate);
         $schedule = $this->service->getBusinessSchedule($startDate, $endDate);
 
         $events = array_merge($reserve, $schedule);
-
-
-        // $startDateTime = new CarbonImmutable('2023-09-13 8:00:00');
-        // $endDateTime = new CarbonImmutable('2023-09-13 11:00:00');
-        // $dummyEvent = ['start'=>$startDateTime->format('c'), 'end'=>$endDateTime->format('c')
-        //     , 'display'=>'background', 'color'=>'#a9a9a9'];
-        // $events[] = $dummyEvent;
-        // $startDateTime = new CarbonImmutable('2023-09-13 15:00:00');
-        // $endDateTime = new CarbonImmutable('2023-09-13 17:00:00');
-        // $dummyEvent = ['start'=>$startDateTime->format('c'), 'end'=>$endDateTime->format('c')
-        //     , 'display'=>'background', 'color'=>'#a9a9a9'];
-        // $events[] = $dummyEvent;
-
-
         $result = ['result_info'=>$resultInfo, 'reserve_info'=>$events];
 
         return response()->json($result);
@@ -95,8 +63,6 @@ class CalendarController extends Controller
      */
     public function addRserve(Request $request): JsonResponse
     {
-Log::debug(print_r($request->all(), true));
-
         // バリデーション
         $request->validate([
             'start_date' => 'required|integer',
@@ -104,13 +70,10 @@ Log::debug(print_r($request->all(), true));
             'user_no' => 'required_without_all:user_name',
             'user_name' => 'required_without_all:user_no',
         ]);
-Log::debug(print_r($request->all(), true));
 
         // 予約情報取得
         $startDate = date('Y-m-d H:i:s', $request->input('start_date') / 1000);
         $endDate = date('Y-m-d H:i:s', $request->input('end_date') / 1000);
-        Log::debug($startDate);
-        Log::debug($endDate);
         $userNo = $request->input('user_no') ? mb_convert_kana($request->input('user_no'), 'a') : ''; // 全角⇒半角
         $userName = $request->input('user_name');
 

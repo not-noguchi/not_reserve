@@ -9,10 +9,10 @@ var calendarEl = document.getElementById("calendar");
 let calendar = new Calendar(calendarEl, {
     plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin],
     initialView: "timeGridWeek",
-//    noEventsContent: 'スケジュールはありません',
     contentHeight: 'auto',
     nowIndicator: true,
     locale: "ja",
+//    timeZone: "Asia/Tokyo",
     initialDate: new Date(),
     navLinks: true,
     editable: true,
@@ -22,12 +22,9 @@ let calendar = new Calendar(calendarEl, {
     allDaySlot: false,
     slotDuration: '00:15', // 15分ごとのslot
     slotLabelInterval: '01:00', // 1時間ごとにラベルを表示
-//    html: true,
-//    googleCalendarApiKey: 'AIzaSyBQMuWSWslRooXDj9tRzOerlWQTArOfuCA',
     eventSources: [
         {
             googleCalendarApiKey: 'AIzaSyBQMuWSWslRooXDj9tRzOerlWQTArOfuCA',
-//            googleCalendarId: 'japanese__ja@holiday.calendar.google.com',
             googleCalendarId: 'ja.japanese#holiday@group.v.calendar.google.com',
             className: 'ja-holidays',
             textColor: 'red',
@@ -79,33 +76,12 @@ let calendar = new Calendar(calendarEl, {
     },
     // 日付をクリック、または範囲を選択したイベント
     selectable: true,
-//     select: function (info) {
-//         alert("selected " + info.startStr + " to " + info.endStr);
-
-//         // 入力ダイアログ
-//         const eventName = prompt("イベントを入力してください");
-        
-//         if (eventName) {
-//             // イベントの追加
-//             calendar.addEvent({
-//                 title: eventName,// + "aaa\nbb",
-//                 start: info.start,
-//                 end: info.end,
-// //                backgroundColor: color.value,
-//                 allDay: false,
-// //                html: true,
-//             });
-//         }
-//     },
     select: arg => {
-        console.log( arg );
         // 新規
-        console.log( arg );
         initEditModal( arg );
     },
     eventClick: arg => {
         // 変更
-        console.log( arg );
         initEditModal( arg );
     },
     events: function (info, successCallback, failureCallback) {
@@ -116,12 +92,8 @@ let calendar = new Calendar(calendarEl, {
             })
             .then((response) => {
                 let returnData = response.data;
-                // 追加したイベントを削除
-       //         calendar.removeAllEvents();
                 // カレンダーに読み込み
-//console.log(returnData.reserve_info);
                 if (returnData.reserve_info) {
-//                    console.log( returnData.reserve_info );
                     successCallback(returnData.reserve_info);
                 }
             })
@@ -130,17 +102,6 @@ let calendar = new Calendar(calendarEl, {
                 alert("スケジュール取得に失敗しました");
             });
     },
-    // dateClick: function (info) {
-    //     console.log( '@@info' );
-    //     console.log( info );
-
-    //     if (info.dayEl.classList.contains("fc-day-past")) {
-    //         alert("選択できません。");
-    //         return;
-    //     }
-    //     //initEditModal( info );
-    // },
-
 
 });
 calendar.render();
@@ -213,19 +174,12 @@ const removeAlreadyModal = () => {
 // モーダル登録処理
 const registerEditModalEvent = ( modal, arg ) => {
 
-//alert(arg.start);
-//alert(arg.end);
-
-//    const start = modal.querySelector( '#start' );
-//    const end = modal.querySelector( '#end' );
-
     const start = arg.start;
     const end = arg.end;
 
     const userNo = modal.querySelector( '.user_no' );
     const userName = modal.querySelector( '.user_name' );
     const title = modal.querySelector( '.title' );
-//    const color = modal.querySelector( '#color' );
   
     // 保存
     const saveButton = modal.querySelector( '#save' );
@@ -236,15 +190,11 @@ const registerEditModalEvent = ( modal, arg ) => {
       
             if ( arg.event !== undefined ) {
                 // 変更時
-                //const endStrings = end.value && start.value !== end.value ? end.value.split( '-' ) : start.value.split( '-' );
-                //const endDate = new Date( endStrings[0], parseInt( endStrings[1] ) - 1, endStrings[2], 23, 59, 59 );
-alert(start);
                 arg.event.setStart( start );
                 arg.event.setEnd( end );
                 arg.event.setProp( 'title', title.value );
             } else {
                 // 新規作成時
-
                 // 入力チェック
             　　if (start.valueOf() == '') {
                     alert('開始日時取得エラー');
@@ -347,30 +297,10 @@ alert(start);
 
 // モダールに既存イベントを設定
 const setupModalData = ( modal, data ) => {
-//    const start = modal.querySelector( '#start' );
-//    const end = modal.querySelector( '#end' );
   const title = modal.querySelector( '.title' );
-//    const color = modal.querySelector( '#color' );
-  
-  console.log( data );
   if ( data.event !== undefined ) {
-//    start.value = /T/.test( data.event.startStr ) ? data.event.startStr.split( 'T' )[0] : data.event.startStr;
-//    end.value = /T/.test( data.event.endStr ) ? data.event.endStr.split( 'T' )[0] : data.event.endStr;
     title.value = data.event.title;
-//    color.value = data.event.backgroundColor;
-  } else {
-//    start.value = data.startStr;
-    
-//    const diffTime = Math.abs( data.end - data.start );
-//    const diffDays = Math.ceil( diffTime / ( 1000 * 60 * 60 * 24 ) );
-//    if ( 1 < diffDays ) {
-    
-//      const endDate = data.end;
-//      endDate.setDate( endDate.getDate() - 1 );
-//      end.value = formatDate( endDate );
-//    }
-  }
-    
+  } 
 };
 
 // DateObject to YYYY-MM-DD

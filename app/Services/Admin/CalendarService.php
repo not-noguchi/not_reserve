@@ -4,7 +4,7 @@ namespace App\Services\Admin;
 
 use App\Dao\ReserveDao;
 use App\Dao\ScheduleDao;
-use App\Dao\MemberDao;
+use App\Dao\UserDao;
 use Illuminate\Support\Facades\Log;
 use Carbon\CarbonImmutable;
 
@@ -38,11 +38,11 @@ class CalendarService
     public function __construct(
         ReserveDao $reserveDao
         ,ScheduleDao $scheduleDao
-        ,MemberDao $memberDao
+        ,UserDao $userDao
     ) {
         $this->reserveDao = $reserveDao;
         $this->scheduleDao = $scheduleDao;
-        $this->memberDao = $memberDao;
+        $this->userDao = $userDao;
     }
 
 
@@ -57,7 +57,7 @@ class CalendarService
     {
         $result = [];
 
-        $reserveInfo = $this->reserveDao->fetchReserve($startDate, $endDate);
+        $reserveInfo = $this->reserveDao->fetchReserveForAdmin($startDate, $endDate);
         if ($reserveInfo->isEmpty()) {
             return $result;
         }
@@ -117,7 +117,6 @@ class CalendarService
             // スケジュール設定なし
             return $result;
         }
-        Log::debug(print_r($scheduleInfo->all(), true));
 
         // スケジュール整形
         foreach($scheduleInfo->all() as $key => $value) {
@@ -147,7 +146,6 @@ class CalendarService
                     , 'color'=>'#808080'];
             }
         }
-        Log::debug(print_r($result, true));
 
         return $result;
     }
@@ -166,7 +164,7 @@ class CalendarService
         $tagetDate = new CarbonImmutable($startDate);
         $tagetDate = $tagetDate->format('Y-m-d');
 
-        $result = $this->memberDao->fetchMemberForAdminReserve($userNo, $tagetDate);
+        $result = $this->userDao->fetchUserForAdminReserve($userNo, $tagetDate);
 
         if (!isset($result)) {
             // 対象会員Noなし
