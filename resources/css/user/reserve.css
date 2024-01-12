@@ -1,0 +1,100 @@
+/* カレンダー */
+.fc .fc-scrollgrid {
+  border-width: 0 0 0 0; /* 外側の枠線消す */
+  font-size: 20px;
+  font-weight: normal;
+}
+.fc-theme-standard td, .fc-theme-standard th {
+  height: 60px; /* 枠の高さ指定 */
+  border: none; /* 枠のボーダー消す */
+  padding: 0 5px 5px;
+}
+/* 今日の背景 */
+.fc .fc-daygrid-day.fc-day-today {
+  background: none;
+}
+.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame {
+  background: rgba(49,159,141,0.1);
+}
+/* 日付を枠の高さいっぱいに */
+.fc .fc-daygrid-day-frame {
+  height: 100%;
+}
+/* 日付を枠の中心に */
+.fc .fc-daygrid-day-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 100%;
+}
+.fc .fc-bg-event {
+  opacity: 1;
+}
+/* イベントタイトル非表示 */
+.fc .fc-bg-event .fc-event-title {
+  display: none !important;
+}
+/* 時間指定のあるイベントの表示スペースをそもそも非表示にしてしまう暴挙 */
+.fc .fc-daygrid-body-natural .fc-daygrid-day-events {
+  display: none;
+}
+.fc .fc-cell-shaded, .fc .fc-day-disabled {
+  background: none;
+}
+
+/* 予約モーダル */
+#reservecolumn {
+  border-bottom: 1px dashed #000;
+  border-left: 0;
+  margin-left: 0;
+  padding: 20px 15px;
+}
+
+.item-reserve {
+  text-align: center;
+}
+
+.btn-reserve{
+  border-radius: 100px;
+  display: block;
+  width: 100px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #6fa1ff;
+  color: #FFF;
+  text-decoration: none;
+  text-align: center;
+  margin: 10px auto;
+}
+
+.select-time {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin: 10px auto;
+}
+
+.select-time::after {
+  position: absolute;
+  right: 15px;
+  width: 10px;
+  height: 7px;
+  background-color: #535353;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  content: '';
+  pointer-events: none;
+}
+
+.select-time select {
+  appearance: none;
+  min-width: 130px;
+  height: 2.8em;
+  padding: .4em calc(.8em + 30px) .4em .8em;
+  border: 1px solid #9899a0;
+  border-radius: 25px;
+  background-color: #fff;
+  color: #333333;
+  font-size: 1em;
+  cursor: pointer;
+}

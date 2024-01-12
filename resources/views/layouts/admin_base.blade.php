@@ -1,4 +1,4 @@
-<!-- ADMINƒx[ƒXƒeƒ“ƒvƒŒ[ƒg -->
+<!-- ADMINﾆ遅ﾂーﾆ湛ﾆ弾ﾆ秩gﾆ致ﾆ椎陳ーﾆ暖 -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -151,7 +151,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; 2023 Labo No.T</span>
+                        <span>Copyright &copy; 2024 Labo No.T</span>
                     </div>
                 </div>
             </footer>
@@ -176,7 +176,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">Ã—</span>
+                        <span aria-hidden="true">A窶鐀</span>
                     </button>
                 </div>
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>

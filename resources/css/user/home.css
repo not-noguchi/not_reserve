@@ -1,0 +1,17 @@
+/* home */
+#rightcolumn a{
+  color: #FFF;
+  text-decoration: none;
+}
+
+.btn-cancel{
+  border-radius: 100px;
+  display: block;
+  width: 120px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #6fa1ff;
+  text-decoration: none;
+  text-align: center;
+  margin: 10px auto;
+}

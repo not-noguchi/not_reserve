@@ -19,13 +19,17 @@ class ScheduleDao
      *
      * @param string $startDate
      * @param string $endDate
+     * @param int planId
      * @return Collection
      */
-    public function fetchSchedule(string $startDate, string $endDate): Collection
+    public function fetchSchedule(string $startDate, string $endDate, int $planId = 0): Collection
     {
         $date = Carbon::now();
 
-        return DB::table('t_schedule AS ts')
+        $arrTimeDivision = config('const.time_division');
+        $timeDivision = $arrTimeDivision[$planId];
+
+        $query = DB::table('t_schedule AS ts')
             ->join('m_schedule AS ms', 'ts.m_schedule_id', '=', 'ms.id')
             ->select(
                 'ts.use_date'
@@ -37,8 +41,41 @@ class ScheduleDao
             ->where('ts.use_date', '<=', $endDate)
 //            ->where('ts.use_date', '>=', $date->format('Y-m-d'))
             ->orderBy('ts.use_date', 'asc')
-            ->orderBy('ms.start_time', 'asc')
-            ->get() ?? collect([]);
+            ->orderBy('ms.start_time', 'asc');
+
+        if (!empty($timeDivision)) {
+            // 時間区分設定
+            $query->whereIn('ms.time_division_id', $timeDivision);
+        }
+
+        return $query->get() ?? collect([]);
+    }
+
+    /**
+     * スケジュール取得 ユーザー予約用
+     *
+     * @param string $targetDate
+     * @param string $targetTime
+     * @return stdClass|null
+     */
+    public function fetchScheduleForReserve(string $targetDate, string $targetTime, int $planId = 0): ?stdClass
+    {
+        $arrTimeDivision = config('const.time_division');
+        $timeDivision = $arrTimeDivision[$planId];
+
+        return DB::table('t_schedule AS ts')
+            ->join('m_schedule AS ms', 'ts.m_schedule_id', '=', 'ms.id')
+            ->select(
+                'ts.id'
+                ,'ts.use_date'
+                ,'ms.start_time'
+                ,'ms.end_time'
+                ,'ts.is_lesson'
+            )
+            ->where('ts.use_date', '=', $targetDate)
+            ->where('ms.start_time', '=', $targetTime)
+            ->whereIn('ms.time_division_id', $timeDivision)
+            ->first();
     }
 
     /**
