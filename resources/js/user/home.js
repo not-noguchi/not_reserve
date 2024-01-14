@@ -4,7 +4,7 @@ function cancel(id) {
     let strReserveDate = document.getElementById('reserve_date_' + id).value;
 
     var now = new Date();
-    now.setHours(now.getHours() + cancellAvailableTime);
+    now.setHours(Number(now.getHours()) + Number(cancellAvailableTime));
     var reserveDate = new Date(strReserveDate + ':00');
     if (reserveDate.getTime() < now.getTime()) {
         // 1時間前を過ぎていたらエラー
