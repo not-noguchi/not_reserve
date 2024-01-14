@@ -22,7 +22,9 @@ class ReserveController extends Controller
         $planId = $request->session()->get('plan_id');
         if ($planId == 0) {
             // プラン未設定
-            return view('home');
+            return view('home', [
+                'reserve_list' => []
+            ]);
         }
         $user = Auth::user();
 

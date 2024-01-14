@@ -13,17 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::get('/home', function () {
-//     return view('home');
-// })->middleware(['auth', 'verified'])->name('home');
 
 Route::namespace('App\Http\Controllers')->middleware('auth')->group(function () {
     Route::get('/profile', 'ProfileController@edit')->name('profile.edit');
@@ -34,7 +31,8 @@ Route::namespace('App\Http\Controllers')->middleware('auth')->group(function () 
 //Route::namespace('App\Http\Controllers\User')->middleware('auth')->group(function() {
 Route::group(['namespace' => 'App\Http\Controllers\User', 'middleware' => ['auth']], function() {
     // Home情報取得
-    Route::get('/home', 'HomeController@index')->name('home.index');
+    Route::get('/', 'HomeController@index')->name('home.index01');
+    Route::get('/home', 'HomeController@index')->name('home.index02');
     // カレンダー情報取得
     Route::get('/reserve', 'ReserveController@index')->name('reserve.index');
 });

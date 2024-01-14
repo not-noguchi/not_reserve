@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
 class RegisteredUserController extends Controller
@@ -45,6 +46,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'api_token' => Str::random(60),
         ]);
 
         event(new Registered($user));
@@ -53,7 +55,7 @@ class RegisteredUserController extends Controller
         $userSettingDao = new UserReserveSettingDao();
         $userSettingDao->registUserSetting(['user_no' => $user->user_no]);
 
-        Auth::login($user);
+        //Auth::login($user);
 
         return redirect(RouteServiceProvider::HOME);
     }
