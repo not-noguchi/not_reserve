@@ -9,6 +9,18 @@
             <x-input-error :messages="$errors->get('user_no')" class="mt-2" />
         </div>
 
+        <!-- plan -->
+        <div class="mt-4">
+            <x-input-label for="plan_id" :value="__('プラン')" />
+            <select name="plan_id" id="plan_id" class="form-control @error('plan_id') is-invalid @enderror">
+                <option value="">-- 選択してください --</option>
+                <option value="1">{{ config('const.m_plan')[1] }}会員</option>
+                <option value="2">{{ config('const.m_plan')[2] }}会員</option>
+                <option value="3">{{ config('const.m_plan')[3] }}会員</option>
+            </select>
+            <x-input-error :messages="$errors->get('plan_id')" class="mt-2" />
+        </div>
+
         <!-- Name -->
         <div class="mt-4">
             <x-input-label for="name" :value="__('名前')" />

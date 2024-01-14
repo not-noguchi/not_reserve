@@ -63,7 +63,13 @@ let calendar = new Calendar(calendarEl, {
             .then((response) => {
                 let returnData = response.data;
                 if (returnData.schedule_info) {
-                    successCallback(returnData.schedule_info.closed);
+                    let closed = returnData.schedule_info.closed;
+                    for(let key in closed) {
+                        // 休業日をグレーアウト
+                        var findParam = 'td[data-date=\'' + closed[key]['date'] + '\']';
+                        document.querySelector(findParam).firstElementChild.style.background = '#808080';
+                    }
+                    //successCallback(returnData.schedule_info.closed);
                     reserveInfo = returnData.reserve_info;
                     businessInfo = returnData.schedule_info.business
                 }
