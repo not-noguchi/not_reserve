@@ -139,9 +139,11 @@ class CalendarService
                 $endDateTime = new CarbonImmutable($date . ' ' . '23:59:59');
                 $result['closed'][] = ['title'=> '休業日'
                     , 'start'=>$startDateTime->format('c')
-                    , 'end'=>$endDateTime->format('c')
+                    , 'end'=>null
                     , 'display'=>'background'
-                    , 'color'=>'#808080'];
+                    , 'color'=>'#808080'
+                    , 'date'=> $date
+                ];
             }
         }
 
