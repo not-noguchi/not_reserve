@@ -114,7 +114,7 @@ function changeTimeSelect(dateStr) {
 
     let tmpReserveInfo = reserveInfo[dateStr];
     var now = new Date();
-    now.setHours(now.getHours() +1);
+    now.setHours(Number(now.getHours()) + Number(reserveAvailableTime));
     for(let key in tmpBusinessInfo) {
         var reserveDate = new Date(dateStr + ' ' + key);
         if (reserveDate.getTime() < now.getTime()) {
@@ -160,7 +160,7 @@ document.getElementById("reserve").onclick = function () {
     }
     // 時間チェック
     var now = new Date();
-    now.setHours(now.getHours() + reserveAvailableTime);
+    now.setHours(Number(now.getHours()) + Number(reserveAvailableTime));
     var reserveDate = new Date(selectTime);
     if (reserveDate.getTime() < now.getTime()) {
         // 1時間前を過ぎていたらエラー
