@@ -35,10 +35,10 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // ユーザ情報取得
-        $userInfo = $this->service->fetchMember($user->user_no);
-        // plan_id設定
-        $request->session()->put('plan_id', $userInfo['plan_id']);
+        // // ユーザ情報取得
+        // $userInfo = $this->service->fetchMember($user->user_no);
+        // // plan_id設定
+        // $request->session()->put('plan_id', $userInfo['plan_id']);
 
         // 予約情報取得
         $reserveInfo = $this->service->fetchReserve($user->user_no);

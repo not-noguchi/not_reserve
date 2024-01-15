@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use App\Dao\UserDao;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,10 +31,18 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // セッションIDの再発行
+        $request->session()->regenerate();
+
         $user = Auth::user();
         $user->update(['api_token' => Str::uuid()]);
-
-        $request->session()->regenerate();
+        // ユーザ情報取得
+        $tagetDate = Carbon::now();
+        $tagetDate = $tagetDate->format('Y-m-d H:i:s');
+        $userDao = new UserDao();
+        $userInfo = $userDao->fetchUser($user->user_no, $tagetDate);
+        // plan_id設定
+        $request->session()->put('plan_id', $userInfo->plan_id);
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }
