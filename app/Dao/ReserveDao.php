@@ -24,7 +24,7 @@ class ReserveDao
     public function fetchReserve(string $startDate, string $endDate, string $userNo): Collection
     {
         return DB::table('t_reserve AS tr')
-            ->join('t_user AS tu', 'tr.user_no', '=', 'tu.user_no')
+            ->leftJoin('t_user AS tu', 'tr.user_no', '=', 'tu.user_no')
             ->select(
                 'tu.user_no'
                 ,'tu.name'
@@ -38,6 +38,7 @@ class ReserveDao
             ->where('tr.use_date', '>=', $startDate)
             ->where('tr.use_date', '<=', $endDate)
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->orderBy('tr.use_date', 'asc')
             ->orderBy('tr.start_time', 'asc')
             ->get() ?? collect([]);
@@ -63,6 +64,7 @@ class ReserveDao
             ->where('tu.user_no', $userNo)
             ->where('tr.use_date', '>=', $startDate)
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->orderBy('tr.use_date', 'asc')
             ->orderBy('tr.start_time', 'asc')
             ->get() ?? collect([]);
@@ -88,6 +90,7 @@ class ReserveDao
 //            ->where('tr.use_date', '>=', $date->format('Y-m-d'))
             ->where(DB::raw('CONCAT(tr.use_date,' . "' '" . ', tr.start_time)'), '>=', $date->format('Y-m-d H:i:s'))
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->count();
     }
 
@@ -106,7 +109,7 @@ class ReserveDao
             // ->join('t_schedule AS ts', 'tr.t_schedule_id', '=', 'ts.id')
             // ->join('m_schedule AS ms', 'ts.m_schedule_id', '=', 'ms.id')
             ->select(
-                'tu.user_no'
+                'tr.user_no'
                 ,'tu.name'
                 ,'tr.use_date'
                 ,'tr.start_time'
@@ -117,6 +120,7 @@ class ReserveDao
             ->where('tr.use_date', '>=', $startDate)
             ->where('tr.use_date', '<=', $endDate)
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->orderBy('tr.use_date', 'asc')
             ->orderBy('tr.start_time', 'asc')
             ->get() ?? collect([]);
@@ -140,6 +144,7 @@ class ReserveDao
             ->where('tr.use_date', '=', $tagetDate)
             ->where('tr.start_time', '=', $tagetTime)
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->get() ?? collect([]);
     }
 
@@ -161,14 +166,14 @@ class ReserveDao
             ->where('tr.start_time', '=', $tagetTime)
             ->where('tr.room_id', '=', $roomId)
             ->whereIn( 'tr.status', [1, 2] )
+            ->whereNull('tr.deleted_at')
             ->get() ?? collect([]);
     }
 
     /**
      * 予約登録
      *
-     * @param int $scheduleId
-     * @param int $roomId
+     * @param array $insertData
      * @return int
      */
     public function registReserve(array $insertData): int
@@ -189,6 +194,7 @@ class ReserveDao
         return DB::table('t_reserve')
             ->where('id', $request['reserve_id'])
             ->where('user_no', $request['user_no'])
+            ->whereNull('deleted_at')
             ->update(['status' => 3]);
     }
 

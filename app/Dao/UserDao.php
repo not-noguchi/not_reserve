@@ -42,6 +42,7 @@ class UserDao
                     ->orWhere('turs.reserve_end', '=>', $targetDate);
             })
             ->whereNull('tu.deleted_at')
+            ->whereNull('turs.deleted_at')
             ->first();
     }
 
@@ -76,6 +77,7 @@ class UserDao
                     ->orWhere('turs.reserve_end', '=>', $end);
             })
             ->whereNull('tu.deleted_at')
+            ->whereNull('turs.deleted_at')
             ->first();
     }
 }

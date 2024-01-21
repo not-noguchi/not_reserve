@@ -50,6 +50,11 @@
                     <i class="fas fa-fw fa-table"></i>
                     <span>予約カレンダー</span></a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/admin/schedule">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>スケジュール設定</span></a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">

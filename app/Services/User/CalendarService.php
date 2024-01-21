@@ -71,7 +71,7 @@ class CalendarService
             $startDateTime = new CarbonImmutable($value->use_date . ' ' . $startTime);
             $endDateTime = new CarbonImmutable($value->use_date . ' ' . $endTime);
             $is_self = false;
-            if ($value->user_no = $userNo) {
+            if ($value->user_no == $userNo) {
                 $is_self = true;
             }
 
