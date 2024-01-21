@@ -9,14 +9,16 @@ use Illuminate\Support\Facades\Log;
 use Carbon\CarbonImmutable;
 
 /**
- * カレンダーAPI　（管理）
+ * スケジュール設定　（管理）
  */
-class CalendarService
+class ScheduleService
 {
     /** @var ReserveDao 予約 */
     private $reserveDao;
     /** @var ScheduleDao スケジュール */
     private $scheduleDao;
+    /** @var UserDao ユーザー */
+    private $userDao;
 
     private const CALENDAR_START_TIME = [
         1 => '00:00'
@@ -131,11 +133,24 @@ class CalendarService
             $endTime = str_replace('50:00', '59:59', $value->end_time);
             $endDateTime = new CarbonImmutable($value->use_date . ' ' . $endTime);
 
+            // 休日カラー
+            $title = '休日:';
+            $color = '#3cb371';
+            if ($value->is_weekdays) {
+                // 平日カラー
+                $color = '#ff8c00';
+                $title = '平日:';
+            }
+            $title .= substr($value->start_time, 0 ,2) . '～';
+            
             $result[] = [
-                'start'=>$startDateTime->format('c')
+                'title'=> $title
+                , 'start'=>$startDateTime->format('c')
                 , 'end'=>$endDateTime->format('c')
-                , 'display'=>'background'
-                , 'color'=>'#ffa500'];
+//                , 'display'=>'background'
+                , 'color'=>$color
+                , 'schedule_id'=>$value->id
+            ];
         }
 
         // スケジュールにない日付を休業日に設定
@@ -184,7 +199,7 @@ class CalendarService
      * スケジュール取得
      *
      * @param string $startDate
-     * @return bool
+     * @return array
      */
     public function fetchSchedule(string $startDate): array
     {
@@ -210,61 +225,63 @@ class CalendarService
      * @param string $startDate
      * @return int
      */
-    public function registRserve(array $scheduleInfo, array $memberInfo, string $startDate): int
+    public function registSchedule(array $request): int
     {
-        $result = 0;
-        $tmpDate = new CarbonImmutable($startDate);
-        $tagetDate = $tmpDate->format('Y-m-d');
-        $tagetTime = $tmpDate->format('H') . ':00:00';
-        $tagetTimeForRoomId = $tmpDate->format('i:s');
-
-        $roomId = 0;
-        foreach (self::CALENDAR_START_TIME as  $key=>$value) {
-            if ($tagetTimeForRoomId == $value) {
-                $roomId = $key;
-                break;
-            }
-        }
-        if ($roomId == 0) {            
-            throw new \Exception('打席指定エラー(' . $tagetDate . ' ' . $tagetTime . '～)', 422);
-        }
-        // 予約チェック
-        $reserveInfo = $this->reserveDao->fetchReserveForAdminReserve($roomId, $tagetDate, $tagetTime);
-        if (!$reserveInfo->isEmpty()) {
-            // 既に予約データあり
-            throw new \Exception('予約済みエラー(' . $tagetDate . ' ' . $tagetTime . '～ ' . $roomId . '番打席)', 422);
+        // マスタスケジュールチェック
+        $scheduleInfo = $this->scheduleDao->fetchMasterScheduleForId($request);
+        if (is_null($scheduleInfo)) {
+            // データなし
+            throw new \Exception('マスタスケジュールエラー(ID:' . $request['m_schedule_id'] . ')', 422);
         }
 
-        // 予約情報作成
+        // スケジュール情報取得
+        $useDate = date('Y-m-d', $request['use_date'] / 1000);
+
+        // スケジュール情報作成
         $insertData = [
-                        't_schedule_id' => $scheduleInfo['id'],
-                        'use_date' => $tagetDate,
-                        'start_time' => $tagetTime,
-                        'room_id' => $roomId,
-                        'user_no' => $memberInfo['user_no'],
-                        'status' => 1,
-                        'update_no' => 'admin_01' // @@@管理者固定値
+                        'm_schedule_id' => $scheduleInfo->id,
+                        'use_date' => $useDate,
                     ];
-        if ($memberInfo['user_no'] == 'g') {
-            // ゲストの場合
-            $insertData['gest_name'] = $memberInfo['name'];
-        }
-        // 予約登録
-        $result = $this->reserveDao->registReserve($insertData);
+        // スケジュール登録
+        $result = $this->scheduleDao->registSchedule($insertData);
 
         return $result;
     }
 
     /**
-     * 予約キャンセル(0件更新の場合、falseを返却)
+     * スケジュール削除(0件更新の場合、falseを返却)
      *
      * @param array $request
      * @return bool
      */
-    public function cancelReserve(array $request): bool
+    public function deleteSchedule(array $request): bool
     {
-        // 予約キャンセル
-        return $this->reserveDao->cancelReserve($request);
+        // スケジュール削除
+        return $this->scheduleDao->deleteSchedule($request);
+    }
+
+    /**
+     * マスタスケジュール取得
+     *
+     * @return array
+     */
+    public function fetchMasterSchedule(): array
+    {
+        $masterSchedule = [];
+        // マスタスケジュール取得
+        $tmpMasterSchedule = $this->scheduleDao->fetchMasterSchedule();
+        // 整形
+        foreach($tmpMasterSchedule->all() as $key => $value) {
+            $masterSchedule[$value->is_weekdays][str_replace(':00:00', '', $value->start_time)] = [
+                    'id' => $value->id
+                    ,'start_time' => $value->start_time
+                    ,'end_time' => $value->end_time
+                    ,'is_lesson' => $value->is_lesson
+                    ,'time_division_id' => $value->time_division_id
+                ];
+        }
+
+        return $masterSchedule;
     }
 
 }

@@ -32,13 +32,17 @@ class ScheduleDao
         $query = DB::table('t_schedule AS ts')
             ->join('m_schedule AS ms', 'ts.m_schedule_id', '=', 'ms.id')
             ->select(
-                'ts.use_date'
+                'ts.id'
+                ,'ts.use_date'
                 ,'ms.start_time'
                 ,'ms.end_time'
+                ,'ms.is_weekdays'
                 ,'ts.is_lesson'
             )
             ->where('ts.use_date', '>=', $startDate)
             ->where('ts.use_date', '<=', $endDate)
+            ->whereNull('ts.deleted_at')
+            ->whereNull('ms.deleted_at')
 //            ->where('ts.use_date', '>=', $date->format('Y-m-d'))
             ->orderBy('ts.use_date', 'asc')
             ->orderBy('ms.start_time', 'asc');
@@ -75,6 +79,8 @@ class ScheduleDao
             ->where('ts.use_date', '=', $targetDate)
             ->where('ms.start_time', '=', $targetTime)
             ->whereIn('ms.time_division_id', $timeDivision)
+            ->whereNull('ms.deleted_at')
+            ->whereNull('ts.deleted_at')
             ->first();
     }
 
@@ -100,6 +106,73 @@ class ScheduleDao
             )
             ->where('ts.use_date', '=', $targetDate)
             ->where('ms.start_time', '=', $targetTime)
+            ->whereNull('ms.deleted_at')
+            ->whereNull('ts.deleted_at')
             ->first();
+    }
+
+    /**
+     * マスタスケジュール取得 管理者用
+     *
+     * @return Collection
+     */
+    public function fetchMasterSchedule(): Collection
+    {
+
+        return DB::table('m_schedule AS ms')
+            ->select(
+                'ms.id'
+                ,'ms.is_weekdays'
+                ,'ms.start_time'
+                ,'ms.end_time'
+                ,'ms.is_lesson'
+                ,'ms.time_division_id'
+            )
+            ->whereNull('ms.deleted_at')
+            ->get() ?? collect([]);;
+    }
+
+    /**
+     * マスタスケジュール取得 管理者用
+     *
+     * @param array $target
+     * @return stdClass
+     */
+    public function fetchMasterScheduleForId(array $target): ?stdClass
+    {
+
+        return DB::table('m_schedule AS ms')
+            ->select(
+                'ms.id'
+            )
+            ->where('id', $target['m_schedule_id'])
+            ->whereNull('ms.deleted_at')
+            ->first();
+    }
+
+    /**
+     * スケジュール登録（管理者用）
+     *
+     * @param array $insertData
+     * @return int
+     */
+    public function registSchedule(array $insertData): int
+    {
+        return DB::table('t_schedule')
+            ->insertGetId($insertData, 'id');
+    }
+
+    /**
+     * スケジュール削除（管理者用）
+     *
+     * @param array $target
+     * @return int
+     */
+    public function deleteSchedule(array $target): int
+    {
+        return DB::table('t_schedule')
+            ->where('id', $target['schedule_id'])
+            ->whereNull('deleted_at')
+            ->delete();
     }
 }

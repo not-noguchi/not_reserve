@@ -14,6 +14,8 @@ export default defineConfig({
                 'resources/js/user/home.js',
                 'resources/css/admin/calendar.css',
                 'resources/js/admin/calendar.js',
+                'resources/css/admin/schedule.css',
+                'resources/js/admin/schedule.js',
             ],
             refresh: true,
         }),

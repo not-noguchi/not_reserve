@@ -28,7 +28,6 @@ Route::namespace('App\Http\Controllers')->middleware('auth')->group(function () 
     Route::delete('/profile', 'ProfileController@destroy')->name('profile.destroy');
 });
 
-//Route::namespace('App\Http\Controllers\User')->middleware('auth')->group(function() {
 Route::group(['namespace' => 'App\Http\Controllers\User', 'middleware' => ['auth']], function() {
     // Home情報取得
     Route::get('/', 'HomeController@index')->name('home.index01');
@@ -37,9 +36,12 @@ Route::group(['namespace' => 'App\Http\Controllers\User', 'middleware' => ['auth
     Route::get('/reserve', 'ReserveController@index')->name('reserve.index');
 });
 
-
 require __DIR__.'/auth.php';
 
-Route::get('/admin/calendar', function () {
-    return view('admin_calendar');
+// 管理画面
+Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => ['basicAuthAdmin']], function() {
+    // 予約カレンダー
+    Route::get('/admin/calendar', 'CalendarController@index')->name('admin.calendar');
+    // スケジュール設定
+    Route::get('/admin/schedule', 'ScheduleController@index')->name('admin.schedule');
 });

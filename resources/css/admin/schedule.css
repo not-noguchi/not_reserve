@@ -1,0 +1,156 @@
+/*今日の背景色*/
+.fc td.fc-day-today{
+  background-color: transparent;
+}
+
+/*祝日のセル*/
+.fc-daygrid-day:has(.ja-holidays){
+  background-color: green;
+}
+/*祝日の背景色*/
+.fc-daygrid-day:has(.ja-holidays){
+background-image: radial-gradient(circle, orange calc(100% / 2 窶錀 1px), transparent calc(100% / 2));
+}
+/* 各日のイベント背景色 */
+.fc-daygrid-day-frame { background-color: #f3f3f3; } 
+th.fc-day-sat {
+  background-color: #eaf4ff;
+}
+th.fc-day-sun {
+  background-color: #ffeaea;
+}
+th.fc-day-sat .fc-col-header-cell-cushion {
+  color: blue;
+}
+th.fc-day-sun .fc-col-header-cell-cushion{
+  color: red;
+}
+/*
+td[data-time = '08:00:00'].fc-timegrid-slot-lane {
+  background-color: #a9a9a9;
+}
+td[data-time = '08:00:00'].fc-timegrid-slot-lane.fc-day-sat {
+  background-color: #eaf4ff;
+}
+td.fc-day-sun {
+  background-color: #ffeaea;
+  !important;
+}
+*/
+/* 定休日 */
+/*
+td.fc-day-tue {
+  background-color: #a9a9a9;
+}
+*/
+.fc-col-header-cell-cushion {
+  color: black;
+}
+.fc-daygrid-day-number {
+  color: black;
+}
+td.fc-day-sat .fc-daygrid-day-number {
+  color: blue;
+}
+td.fc-day-sun .fc-daygrid-day-number {
+  color: red;
+}
+td.fc-timegrid-slot {
+  height: 6.0em !important; /* 1行の高さ */
+  border-bottom: 0 !important;
+}
+.fc-event-title{
+  font-size: 1.5em;
+}
+.fc-event-time{
+   display : none;
+}
+.fc-timegrid-event-harness{
+  width: 50%;
+}
+/* 縦書き
+.fc-event-title{
+  -ms-writing-mode: tb-rl;
+  writing-mode: vertical-rl;
+}
+*/
+/* slot labelのサイズ */
+/* 文字サイズ
+td.fc-timegrid-slot.fc-timegrid-slot-label{
+  font-size: 0.8em;
+}
+*/
+/* slotのサイズ */
+/*
+td.fc-timegrid-slot.fc-timegrid-slot-lane.fc-timegrid-slot-minor{
+  font-size: 0.8em;
+}
+td.fc-timegrid-slot.fc-timegrid-slot-lane{
+  font-size: 0.8em;
+}
+*/
+
+/* event reserve-modal */ 
+.reserve-modal {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+  max-width: 250px;
+  position: relative;
+  background-color: #fff;
+  border: 3px solid #f0f0f0;
+  border-radius: 4px;
+}
+
+
+.close{
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate( 50%, -50% );
+  transition: .15s;
+}
+.close:hover {
+  opacity: .85;
+  background-color: transparent ;
+}
+
+.is_weekdays{
+  transform: scale(1.5);
+  margin: 0 40px 0 10px;
+}
+
+.schedule{
+    width: 100%; /*親要素いっぱい広げる*/
+    padding: 10px 15px; /*ボックスを大きくする*/
+    font-size: 16px;
+    border-radius: 3px; /*ボックス角の丸み*/
+    border: 2px solid #ddd; /*枠線*/
+    box-sizing: border-box; /*横幅の解釈をpadding, borderまでとする*/
+    margin: 5px 0px 20px;
+}
+
+.save,.delete {
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  width: 120px;
+  margin: auto;
+  padding: 0.5rem 2rem;
+  font-weight: bold;
+  border: 2px solid #27acd9;
+  background: #27acd9;
+  color: #fff;
+  border-radius: 100vh;
+  transition: 0.5s;
+  font-size: 1.2em;
+}
+.save:hover,.delete:hover {
+  color: #27acd9;
+  background: #fff;
+}
+/* event modal */ 

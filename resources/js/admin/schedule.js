@@ -20,18 +20,9 @@ let calendar = new Calendar(calendarEl, {
     firstDay:0, // 週の始まり
     fixedWeekCount: false,
     allDaySlot: false,
-    slotDuration: '00:15', // 15分ごとのslot
+    slotDuration: '01:00', // 15分ごとのslot
     slotLabelInterval: '01:00', // 1時間ごとにラベルを表示
-    eventSources: [
-        {
-            googleCalendarApiKey: 'AIzaSyBQMuWSWslRooXDj9tRzOerlWQTArOfuCA',
-            googleCalendarId: 'ja.japanese#holiday@group.v.calendar.google.com',
-            className: 'ja-holidays',
-            textColor: 'red',
-            rendering: 'background',
-            color:"#ffd0d0"
-        }
-    ],
+
     headerToolbar: {
         left: 'prev,next,today',
         center: 'title',
@@ -78,15 +69,49 @@ let calendar = new Calendar(calendarEl, {
     selectable: true,
     select: arg => {
         // 新規
+        var argDate = new Date(arg.start);
+        let events = calendar.getEvents();
+        for (var i=0; i<events.length; i++) {
+            var tmpDate = new Date(events[i].start);
+            if (tmpDate.getTime() == argDate.getTime()) {
+                // スケジュール設定済み
+                return false;
+            }
+        }
+        let element = document.getElementById('is_weekdays');
+        element.checked = true;
+        isWeekdaysFlg = 1;
+
+        if (isWeekdays[argDate.getDay()] == 1) {
+            // 平日
+            if (masterSchedule[1][( '00' + argDate.getHours() ).slice( -2 )] == null
+                && masterSchedule[0][( '00' + argDate.getHours() ).slice( -2 )] == null) {
+                alert('登録出来ない時間です。');
+                return false;
+            }
+        } else {
+            // 土日
+            if (masterSchedule[0][( '00' + argDate.getHours() ).slice( -2 )] == null) {
+                alert('登録出来ない時間です。');
+                return false;
+            }
+            element.checked = false;
+            isWeekdaysFlg = 0;
+        }
+
         initEditModal( arg );
     },
     eventClick: arg => {
         // 変更
+        if (arg.event.title.substr(1, 1) != '日') {
+            // 予約イベントは拾わない
+            return false;
+        }
         initEditModal( arg );
     },
     events: function (info, successCallback, failureCallback) {
-        // カレンダー情報取得処理の呼び出し
-        axios.post("/api/admin/calendar/fetch", {
+        // スケジュール情報取得処理の呼び出し
+        axios.post("/api/admin/schedule/fetch", {
                 start_date: info.start.valueOf(),
                 end_date: info.end.valueOf(),
             })
@@ -118,18 +143,18 @@ const initEditModal = data  => {
 
     setupModalPosition( modal, data.jsEvent );
     document.body.appendChild( modal );
-  if ( data.event === undefined ) {
-    // イベントが取得出来ない(新規の)場合title、削除ボタン非表示
-    document.querySelector( '#modal .delete' ).remove();
-    document.querySelector( '#modal .modal__title' ).remove();
-  } else {
-    // イベントが取得出来た場合、保存ボタン非表示
-    document.querySelector( '#modal .modal__no' ).remove();
-    document.querySelector( '#modal .modal__name' ).remove();
-    document.querySelector( '#modal .save' ).remove();
-  }
+    if ( data.event === undefined ) {
+        // イベントが取得出来ない(新規の)場合title、削除ボタン非表示
+        document.querySelector( '#modal .delete' ).remove();
+        document.querySelector( '#modal .modal__del_schedule' ).remove();
+    } else {
+        // イベントが取得出来た場合、保存ボタン非表示
+        document.querySelector( '#modal .modal__weekdays' ).remove();
+        document.querySelector( '#modal .modal__add_schedule' ).remove();
+        document.querySelector( '#modal .save' ).remove();
+    }
   
-  setupModalData( modal, data );
+    setupModalData( modal, data );
 
     registerEditModalEvent( modal, data );
 };
@@ -196,21 +221,36 @@ const registerEditModalEvent = ( modal, arg ) => {
             } else {
                 // 新規作成時
                 // 入力チェック
-            　　if (start.valueOf() == '') {
-                    alert('開始日時取得エラー');
+                var startDate = new Date(start);
+                if (isWeekdays[startDate.getDay()] == 0 && isWeekdaysFlg == 1) {
+                    alert('平日設定エラー(土日には設定出来ません)');
                     return false;
                 }
-            　　if (userNo.value == '' && userName.value == '') {
-                    alert('No 氏名はいずれか入力必須です');
+                var m_schedule_id = null;
+                if (masterSchedule[isWeekdaysFlg][( '00' + startDate.getHours() ).slice( -2 )] == null) {
+                    alert('登録出来ない時間です');
                     return false;
+                } else {
+                    // masterScheduleのID取得
+                    m_schedule_id = masterSchedule[isWeekdaysFlg][( '00' + startDate.getHours() ).slice( -2 )]['id'];
                 }
+                var $title = '';
+                var $color = '';
+                if (isWeekdaysFlg == 1) {
+                    // 平日
+                    $title = '平日:';
+                    $color = '#ff8c00';
+                } else {
+                    // 休日
+                    $title = '休日:';     
+                    $color = '#3cb371';               
+                }
+                $title +=  ( '00' + startDate.getHours() ).slice( -2 ) + '～';
 
                 // 予約登録(カレンダー用)処理の呼び出し
-                axios.post("/api/admin/calendar/add_reserve", {
-                        start_date: start.valueOf(),
-                        end_date: end.valueOf(),
-                        user_no: userNo.value,
-                        user_name: userName.value
+                axios.post("/api/admin/schedule/add", {
+                        m_schedule_id: m_schedule_id,
+                        use_date: start.valueOf(),
                     })
                     .then((response) => {
                         let returnData = response.data;
@@ -220,10 +260,9 @@ const registerEditModalEvent = ( modal, arg ) => {
                             calendar.addEvent( {
                               start: start,
                               end: end,
-                              title: returnData.user_info.user_no + ' ' + returnData.user_info.name,
-                              user_no: returnData.user_info.user_no,
-                              reserve_id: returnData.user_info.reserve_id,
-                              backgroundColor: '#4169e1'//color.value
+                              title: $title,
+                              schedule_id: returnData.schedule_info.schedule_id,
+                              backgroundColor: $color
                             } );
                         } else {
                             alert(returnData.result_info.message);
@@ -234,7 +273,7 @@ const registerEditModalEvent = ( modal, arg ) => {
                         if (response.data.result_info.message) {
                             alert(response.data.result_info.message);
                         } else {
-                            alert("予約登録に失敗しました");
+                            alert("スケジュール登録に失敗しました");
                         }
                     });
 
@@ -261,10 +300,9 @@ const registerEditModalEvent = ( modal, arg ) => {
 
         deleteButton.addEventListener( 'click', e => {
 
-            // 予約キャンセル(カレンダー用)処理の呼び出し
-            axios.post("/api/admin/calendar/cancel_reserve", {
-                    user_no: arg.event.extendedProps.user_no,
-                    reserve_id: arg.event.extendedProps.reserve_id
+            // スケジュール削除処理の呼び出し
+            axios.post("/api/admin/schedule/delete", {
+                    schedule_id: arg.event.extendedProps.schedule_id
                 })
                 .then((response) => {
                     let returnData = response.data;
@@ -294,10 +332,16 @@ const registerEditModalEvent = ( modal, arg ) => {
 
 // モダールに既存イベントを設定
 const setupModalData = ( modal, data ) => {
-  const title = modal.querySelector( '.title' );
+
+  const title = modal.querySelector( '.schedule' );
+
   if ( data.event !== undefined ) {
-    title.value = data.event.title;
-  } 
+    // 削除時(イベント変更)
+    title.value = formatDateTime(data.event.start);
+  } else {
+    // 登録時(イベント新規)
+    title.value = formatDateTime(data.start);
+  }
 };
 
 // DateObject to YYYY-MM-DD
@@ -314,3 +358,25 @@ function formatDate(date) {
 
     return [year, month, day].join('-');
 }
+
+// DateObject to YYYY-MM-DD 00:00~
+function formatDateTime(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear(),
+        hour = d.getHours();
+
+    if (month.length < 2) {
+        month = '0' + month;
+    }
+    if (day.length < 2) {
+        day = '0' + day;
+    }
+    if (hour.length < 2) {
+        hour = '0' + hour;
+    }
+
+    return [year, month, day].join('-') + ' ' + hour + ':00~';
+}
+

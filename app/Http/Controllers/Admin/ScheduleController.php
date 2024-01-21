@@ -3,24 +3,24 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\CalendarService;
+use App\Services\Admin\ScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 
-class CalendarController extends Controller
+class ScheduleController extends Controller
 {
 
-    /** @var CalendarService カレンダーサービスクラス */
+    /** @var ScheduleService スケジュール設定サービスクラス */
     private $service;
 
     /**
      * コンストラクタ
      *
-     * @param CalendarService $service
+     * @param ScheduleService $service
      */
-    public function __construct(CalendarService $service)
+    public function __construct(ScheduleService $service)
     {
         $this->service = $service;
     }
@@ -31,9 +31,10 @@ class CalendarController extends Controller
      */
     public function index(Request $request): View
     {
-
-        return view('admin_calendar', [
-//            'masterSchedule' => $masterSchedule
+        // マスタスケジュール取得
+        $masterSchedule = $this->service->fetchMasterSchedule();
+        return view('admin_schedule', [
+            'masterSchedule' => $masterSchedule
         ]);
     }
 }
