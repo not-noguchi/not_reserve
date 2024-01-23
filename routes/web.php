@@ -28,7 +28,7 @@ Route::namespace('App\Http\Controllers')->middleware('auth')->group(function () 
     Route::delete('/profile', 'ProfileController@destroy')->name('profile.destroy');
 });
 
-Route::group(['namespace' => 'App\Http\Controllers\User', 'middleware' => ['auth']], function() {
+Route::group(['namespace' => 'App\Http\Controllers\User', 'middleware' => ['auth','verified']], function() {
     // Home情報取得
     Route::get('/', 'HomeController@index')->name('home.index01');
     Route::get('/home', 'HomeController@index')->name('home.index02');

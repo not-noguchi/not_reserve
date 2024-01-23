@@ -25,6 +25,7 @@
         プランに<span class="marker">未設定会員</span>と表示される場合は予約情報の設定が済んでおりません。システム側の対応をお待ちください。<br />
         @endif
         <span class="marker">テスト運用中です</span><br />
+        <span>カレンダーサイズ調整、選択日色付け1/23UP</span><br />
       </div>
 
       <h2>予約情報</h2>

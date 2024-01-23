@@ -103,6 +103,14 @@ function changeTimeSelect(dateStr) {
     }
     let selectDate = document.getElementById('select_date');
     let selectTime = document.getElementById('select_time');
+    // 選択日付色変更（リセット）
+    if (selectDate.textContent != '予約日') {
+       var findParam = 'td[data-date=\'' + selectDate.textContent + '\']';
+       document.querySelector(findParam).firstElementChild.style.background = '#ffffff';
+    }
+    // 選択日付色変更
+    var findParam = 'td[data-date=\'' + dateStr + '\']';
+    document.querySelector(findParam).firstElementChild.style.background = '#99ccff';
     // 日付設定
     selectDate.textContent = dateStr;
 
