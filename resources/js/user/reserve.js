@@ -106,7 +106,9 @@ function changeTimeSelect(dateStr) {
     // 選択日付色変更（リセット）
     if (selectDate.textContent != '予約日') {
        var findParam = 'td[data-date=\'' + selectDate.textContent + '\']';
-       document.querySelector(findParam).firstElementChild.style.background = '#ffffff';
+       if (document.querySelector(findParam) != null) {
+           document.querySelector(findParam).firstElementChild.style.background = '#ffffff';
+       }
     }
     // 選択日付色変更
     var findParam = 'td[data-date=\'' + dateStr + '\']';
