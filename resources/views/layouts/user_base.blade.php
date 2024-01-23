@@ -73,7 +73,7 @@
               <h2>Update</h2>
                 <!-- テキストエリア -->
                 <textarea rows="3" cols="20">
-                  2024/01/11 up
+                  2024/01/23 up
                 </textarea>
 
               <h2>Link</h2>

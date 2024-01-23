@@ -12,8 +12,6 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Dao\UserDao;
-use App\Models\User;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 
 class AuthenticatedSessionController extends Controller
@@ -31,12 +29,6 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $user = User::where('email', $request['email'])->first();
-        if (isset($user) && empty($user->email_verified_at)) {
-            throw ValidationException::withMessages([
-                'email' => trans('メール認証後にログインを行ってください'),
-            ]);
-        }
         // PWチェック
         $request->authenticate();
 

@@ -5,9 +5,9 @@
   font-weight: normal;
 }
 .fc-theme-standard td, .fc-theme-standard th {
-  height: 60px; /* 枠の高さ指定 */
+  height: 30px; /* 枠の高さ指定 */
   border: none; /* 枠のボーダー消す */
-  padding: 0 5px 5px;
+  padding: 0 2px 2px;
 }
 /* 今日の背景 */
 .fc .fc-daygrid-day.fc-day-today {
@@ -42,7 +42,13 @@
 .fc .fc-cell-shaded, .fc .fc-day-disabled {
   background: none;
 }
-
+.fc .fc-toolbar-title {
+  font-size: 1.2em;
+  margin: 0px;
+}
+#rightcolumn a {
+  text-decoration:none;
+}
 /* 予約モーダル */
 #reservecolumn {
   border-bottom: 1px dashed #000;
