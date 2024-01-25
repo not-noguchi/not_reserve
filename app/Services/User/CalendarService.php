@@ -7,6 +7,7 @@ use App\Dao\ScheduleDao;
 use App\Dao\UserDao;
 use Illuminate\Support\Facades\Log;
 use Carbon\CarbonImmutable;
+use Carbon\Carbon;
 
 /**
  * カレンダーAPI　（ユーザー）
@@ -101,15 +102,23 @@ class CalendarService
      *
      * @param string $startDate
      * @param string $endDate
-     * @param string $planId
+     * @param string $userNo
      * @return array|null
      */
-    public function getBusinessSchedule(string $startDate, string $endDate, string $planId): ?array
+    public function getBusinessSchedule(string $startDate, string $endDate, string $userNo): ?array
     {
         $result = [];
 
+        $tagetDate = Carbon::now();
+        $userInfo = $this->userDao->fetchUser($userNo, $tagetDate->format('Y-m-d H:i:s'));
+        $nowDate = $tagetDate->format('Y-m-d');
+        $startScheduleDate = $startDate;
+        if ($nowDate > $startDate) {
+            // 開始日変更
+            $startScheduleDate = $nowDate;
+        }
         // スケジュール取得
-        $scheduleInfo = $this->scheduleDao->fetchSchedule($startDate, $endDate, $planId);
+        $scheduleInfo = $this->scheduleDao->fetchSchedule($startScheduleDate, $endDate, $userInfo->plan_id);
         if ($scheduleInfo->isEmpty()) {
             // スケジュール設定なし
             return $result;

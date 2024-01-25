@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Carbon\Carbon;
+use App\Dao\UserDao;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
@@ -35,10 +37,16 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        // // ユーザ情報取得
-        // $userInfo = $this->service->fetchMember($user->user_no);
-        // // plan_id設定
-        // $request->session()->put('plan_id', $userInfo['plan_id']);
+        $planId = $request->session()->get('plan_id');
+        if ($planId == null) {
+            // plan_id設定
+            $userDao = new UserDao();
+            $tagetDate = Carbon::now()->format('Y-m-d H:i:s');
+            $userInfo = $userDao->fetchUser($user->user_no, $tagetDate);
+            $request->session()->put('plan_id', $userInfo->plan_id);
+            Log::debug('reset user_no:' . $user->user_no);
+            Log::debug('reset plan_id:' . $userInfo->plan_id);
+        }
 
         // 予約情報取得
         $reserveInfo = $this->service->fetchReserve($user->user_no);

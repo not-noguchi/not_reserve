@@ -50,7 +50,7 @@ class CalendarController extends Controller
 
         $user = Auth::user();
         $reserve = $this->service->fetchReserve($startDate, $endDate, $user->user_no);
-        $schedule = $this->service->getBusinessSchedule($startDate, $endDate, $request->session()->get('plan_id'));
+        $schedule = $this->service->getBusinessSchedule($startDate, $endDate, $user->user_no);
 
         $result = ['result_info'=>$resultInfo, 'reserve_info'=>$reserve, 'schedule_info'=>$schedule];
 
