@@ -214,11 +214,13 @@ function showPrevDateRange(today) {
     const year = today.getFullYear();
     const month = today.getMonth() + 1;
     const isLastYear = month - 1 === 0 ? true : false;
-    const isNextYear = month + 3 > 12 ? true : false;
+    const isNextYear = month + 2 > 12 ? true : false;
 
     return [
-        // 2か月前まで
-        (isLastYear ? year - 1 : year) + "-" + dateZeroPadding(isLastYear ? 12 : month - 2) + "-01",
+        // 1か月前まで
+//        (isLastYear ? year - 1 : year) + "-" + dateZeroPadding(isLastYear ? 12 : month - 2) + "-01",
+        // 0か月前まで
+        year + "-" + dateZeroPadding(month) + "-01",
         // 1か月先まで表示
         (isNextYear ? year + 1 : year) + "-" + dateZeroPadding(isNextYear ? month - 12 + 2 : month + 2) + "-01",
     ];
