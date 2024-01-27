@@ -12,7 +12,6 @@
         } else {
           isWeekdaysFlg = 1;
         }
-        console.log(isWeekdaysFlg);
     }
   </script>
 

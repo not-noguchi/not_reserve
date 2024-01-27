@@ -55,6 +55,11 @@
                     <i class="fas fa-fw fa-table"></i>
                     <span>スケジュール設定</span></a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/admin/user">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>会員管理</span></a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
