@@ -33,6 +33,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin\Api', 'prefix' => '{api
     Route::post('schedule/add', 'ScheduleController@add')->name('schedule_add');
     // スケジュール情報削除
     Route::post('schedule/delete', 'ScheduleController@delete')->name('schedule_delete');
+    // ユーザー削除
+    Route::post('user/delete', 'UserController@delete')->name('user_delete');
 });
 
 

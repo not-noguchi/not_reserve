@@ -44,4 +44,6 @@ Route::group(['namespace' => 'App\Http\Controllers\Admin', 'middleware' => ['bas
     Route::get('/admin/calendar', 'CalendarController@index')->name('admin.calendar');
     // スケジュール設定
     Route::get('/admin/schedule', 'ScheduleController@index')->name('admin.schedule');
+    // ユーザ管理
+    Route::get('/admin/user', 'UserController@index')->name('admin.user');
 });
