@@ -22,11 +22,9 @@ class ReserveController extends Controller
         $planId = $request->session()->get('plan_id');
         if ($planId == 0) {
             // プラン未設定
-            return view('home', [
-                'reserve_list' => []
-            ]);
+            // セッションが切れるときがあるが予約カレンダーでセッション見ないので何もしない
         }
-        $user = Auth::user();
+        //$user = Auth::user();
 
 
         return view('reserve', [
