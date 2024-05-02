@@ -80,17 +80,4 @@ class HomeService
         return (array)$result;
     }
 
-    /**
-     * 予約件数取得
-     *
-     * @param array $userInfo
-     * @return array
-     */
-    public function fetchReserveCnt(array $userInfo): int
-    {
-        $result = 0;
-        $result = $this->reserveDao->fetchReserveForCheck($userInfo['user_no']);
-
-        return $result;
-    }
 }

@@ -184,32 +184,91 @@ class CalendarService
     }
 
     /**
-     * 予約件数取得
+     * 予約チェック
      *
      * @param array $userInfo
-     * @return array
+     * @return void
      */
-    public function fetchReserveCnt(array $userInfo): int
+    public function fetchReserveForCheck(array $userInfo, CarbonImmutable $startDateCarbon): void
     {
-        $result = 0;
-        $result = $this->reserveDao->fetchReserveForCheck($userInfo['user_no']);
+        $tagetDate = $startDateCarbon->format('Y-m-d');
+        $tagetTime = $startDateCarbon->format('H') . ':00:00';
+        $date = Carbon::now();
+        $isNowDate = false;
+        if ($tagetDate == $date->format('Y-m-d')) {
+            // 当日予約
+            $isNowDate = true;
+        }
 
-        return $result;
+        // 当日予約数
+        $todayCnt = 0;
+        // 同一日予約開始日
+        $sameDayReserveStartTime = [];
+        // 未来予約数
+        $futureCnt = 0;
+        $reserveInfo = $this->reserveDao->fetchReserveForCheck($userInfo['user_no'], $isNowDate);
+        if (!$reserveInfo->isEmpty()) {
+            foreach($reserveInfo->all() as $reserve) {
+                if ($tagetDate == $reserve->use_date && $tagetTime == $reserve->start_time) {
+                    // 予約あり(自分)
+                    throw new \Exception('同一日時予約済みエラー(' . $tagetDate . ' ' . $tagetTime . '～ )', 422);
+                } elseif ($tagetDate == $reserve->use_date) {
+                    // 同一日予約開始日の保存
+                    $sameDayReserveStartTime[] = $reserve->start_time;
+                }
+                if ($isNowDate && $tagetDate == $reserve->use_date) {
+                    $todayCnt++;
+                }
+                if ($reserve->use_date . ' ' . $reserve->start_time >= $date->format('Y-m-d H:i:s')) {
+                    $futureCnt++;
+                }
+            }
+        }
+        $mstReserveCnt = config('const.reserve_cnt');
+        if (
+            $mstReserveCnt[$userInfo['plan_id']] <= $futureCnt
+        ) {
+            // 最大予約数オーバー(未来の予約数チェック)
+            throw new \Exception('予約登録エラー(予約数オーバー)', 500);
+        } elseif (
+            $isNowDate
+            && $mstReserveCnt[$userInfo['plan_id']] <= $todayCnt
+        ) {
+            // 当日最大予約数オーバー
+            throw new \Exception('予約登録エラー(当日予約数オーバー)', 500);
+        }
+
+        if (count($sameDayReserveStartTime) > 0) {
+            // 同一日予約ありの場合、連続予約チェック
+            $tagetTimeAdd = $startDateCarbon->addHour()->format('H') . ':00:00';
+            $tagetTimeSub = $startDateCarbon->subHour()->format('H') . ':00:00';
+            $isContinuous = false;
+            foreach($sameDayReserveStartTime as $startTime) {
+                if ($startTime == $tagetTimeAdd || $startTime == $tagetTimeSub) {
+                    // 前後1時間に予約あり
+                    $isContinuous = true;
+                    break;
+                }
+            }
+            if (!$isContinuous) {
+                // 連続予約でない場合、エラー
+                throw new \Exception('同日複数ご予約の場合、連続した時間をご指定ください', 500);
+            }
+        }
     }
 
     /**
      * スケジュール取得
      *
-     * @param string $startDate
+     * @param CarbonImmutable $startDateCarbon
      * @param array $userInfo
      * @return array
      */
-    public function fetchSchedule(string $startDate, array $userInfo): array
+    public function fetchSchedule(CarbonImmutable $startDateCarbon, array $userInfo): array
     {
         $result = [];
-        $tmpDate = new CarbonImmutable($startDate);
-        $tagetDate = $tmpDate->format('Y-m-d');
-        $tagetTime = $tmpDate->format('H') . ':00:00';
+        $tagetDate = $startDateCarbon->format('Y-m-d');
+        $tagetTime = $startDateCarbon->format('H') . ':00:00';
 
         $result = $this->scheduleDao->fetchScheduleForAdminReserve($tagetDate, $tagetTime, $userInfo['plan_id']);
 
@@ -224,16 +283,15 @@ class CalendarService
     /**
      * 予約登録
      *
-     * @param string $startDate
+     * @param CarbonImmutable $startDateCarbon
      * @param array $userInfo
      * @return int
      */
-    public function registRserve(array $scheduleInfo, array $userInfo, string $startDate): int
+    public function registRserve(array $scheduleInfo, array $userInfo, CarbonImmutable $startDateCarbon): int
     {
         $result = 0;
-        $tmpDate = new CarbonImmutable($startDate);
-        $tagetDate = $tmpDate->format('Y-m-d');
-        $tagetTime = $tmpDate->format('H:i:s');
+        $tagetDate = $startDateCarbon->format('Y-m-d');
+        $tagetTime = $startDateCarbon->format('H:i:s');
         $arrRoomId = [1=>1, 2=>2, 3=>3, 4=>4];
 
         // 予約チェック
