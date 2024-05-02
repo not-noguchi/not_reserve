@@ -81,6 +81,8 @@ class CalendarController extends Controller
         $resultInfo = ['code'=>200, 'message'=>''];
 
         try {
+            $startDateCarbon = new CarbonImmutable($startDate);
+
             $userInfo = [];
             if (!empty($userNo)) {
                 // ユーザ情報取得＆チェック
@@ -88,18 +90,13 @@ class CalendarController extends Controller
             }
 
             // 予約チェック
-            $reserveCnt = $this->service->fetchReserveCnt($userInfo);
-            $mstReserveCnt = config('const.reserve_cnt');
-            if ($mstReserveCnt[$userInfo['plan_id']] <= $reserveCnt) {
-                // 最大予約数オーバー
-                throw new \Exception('予約登録エラー(予約数オーバー)', 500);
-            }
+            $this->service->fetchReserveForCheck($userInfo, $startDateCarbon);
 
             // スケジュール取得＆チェック
-            $scheduleInfo = $this->service->fetchSchedule($startDate, $userInfo);
+            $scheduleInfo = $this->service->fetchSchedule($startDateCarbon, $userInfo);
 
             // 予約登録
-            $reserveId = $this->service->registRserve($scheduleInfo, $userInfo, $startDate);
+            $reserveId = $this->service->registRserve($scheduleInfo, $userInfo, $startDateCarbon);
             $userInfo['reserve_id'] = $reserveId;
             if (!$reserveId) {
                 throw new \Exception('予約登録エラー', 500);
@@ -107,7 +104,7 @@ class CalendarController extends Controller
 
         } catch(\Exception $e) {
             $resultInfo = ['code'=>$e->getCode(), 'message'=>$e->getMessage()];
-            Log::error('code:' . $resultInfo['code'] . ' ' . 'message:' . $resultInfo['message']);
+            Log::error('code:' . $resultInfo['code'] . ' userNo=' . $userNo . ' message:' . $resultInfo['message']);
         }
 
         $result = ['result_info'=>$resultInfo];

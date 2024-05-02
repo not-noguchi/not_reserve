@@ -75,23 +75,31 @@ class ReserveDao
      * 予約情報取得(予約チェック用)
      *
      * @param string $userNo
+     * @param bool $isNowDate
      * @return int
      */
-    public function fetchReserveForCheck(string $userNo): int
+    public function fetchReserveForCheck(string $userNo, bool $isNowDate): Collection
     {
         $date = Carbon::now();
+        $checkDate = $date->format('Y-m-d H:i:s');
+        if ($isNowDate) {
+            // 当日予約
+            $checkDate = $date->format('Y-m-d 00:00:00');
+        }
 
         return DB::table('t_reserve AS tr')
             ->join('t_user AS tu', 'tr.user_no', '=', 'tu.user_no')
             ->select(
                 'tu.user_no'
+                ,'tr.use_date'
+                ,'tr.start_time'
             )
             ->where('tu.user_no', $userNo)
 //            ->where('tr.use_date', '>=', $date->format('Y-m-d'))
-            ->where(DB::raw('CONCAT(tr.use_date,' . "' '" . ', tr.start_time)'), '>=', $date->format('Y-m-d H:i:s'))
+            ->where(DB::raw('CONCAT(tr.use_date,' . "' '" . ', tr.start_time)'), '>=', $checkDate)
             ->whereIn( 'tr.status', [1, 2] )
             ->whereNull('tr.deleted_at')
-            ->count();
+            ->get() ?? collect([]);
     }
 
     /**
