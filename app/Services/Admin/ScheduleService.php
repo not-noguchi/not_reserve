@@ -136,10 +136,14 @@ class ScheduleService
             // 休日カラー
             $title = '休日:';
             $color = '#3cb371';
-            if ($value->is_weekdays) {
+            if ($value->is_weekdays == 1) {
                 // 平日カラー
                 $color = '#ff8c00';
                 $title = '平日:';
+            } else if ($value->is_weekdays == 2) {
+                // 特日カラー
+                $color = '#ff0084';
+                $title = '特日:';
             }
             $title .= substr($value->start_time, 0 ,2) . '～';
             
